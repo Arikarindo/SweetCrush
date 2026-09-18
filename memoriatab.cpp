@@ -1,12 +1,17 @@
 #include "matriz.h"
 #include "constantes.h"
 
-unsigned char* crearTablero(int filas, int columnas, int &bytesReservados) {
-    int totalBits = filas * columnas * BITSPORFICHA;
-    bytesReservados = (totalBits + 7) / 8; 
 
-    unsigned char* tablero = new unsigned char[bytesReservados]();
-    return tablero;
+int calcular_bytes_necesarios(int totalFichas) {
+    int totalBits = totalFichas * BITSPORFICHA; 
+    return (totalBits + 7) / 8;
+}
+
+
+unsigned char* crearTablero(int filas, int columnas, int &bytesReservados) {
+    bytesReservados = calcular_bytes_necesarios(filas * columnas); 
+    unsigned char* tablero = new unsigned char[bytesReservados](); 
+    return tablero; 
 }
 
 unsigned char obtenerFicha(const unsigned char* tablero, int indiceFicha) {
@@ -70,3 +75,27 @@ unsigned char* evaluarYRedimensionar(unsigned char* tableroViejo, int fichasActi
 
     return tableroViejo;
 }
+
+void limpiar_bits_no_usados(unsigned char* tablero, int totalFichas, int bytesReservados) {
+    if (tablero == nullptr || totalFichas <= 0 || bytesReservados <= 0) {
+        return;
+    }
+    int totalBits = totalFichas * BITSPORFICHA;
+    int bytesUtilizados = (totalBits + 7) / 8;
+    int bitsValidosUltimoByte = totalBits % 8;
+    if (bitsValidosUltimoByte != 0) {
+        unsigned char mascara = static_cast<unsigned char>((1u << bitsValidosUltimoByte) - 1u);
+        tablero[bytesUtilizados - 1] &= mascara;
+    }
+    for (int i = bytesUtilizados; i < bytesReservados; i++) {
+        tablero[i] = 0;
+    }
+}
+
+void liberar_tablero(unsigned char* &tablero) {
+    if (tablero != nullptr) {
+        delete[] tablero;   
+        tablero = nullptr;
+    }    
+}
+
