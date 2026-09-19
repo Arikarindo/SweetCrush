@@ -4,6 +4,9 @@
 // Memoria de tablero
 unsigned char obtenerFicha(const unsigned char* tablero, int indiceFicha);
 void guardarFicha(unsigned char* tablero, int indiceFicha, unsigned char valor);
+int calcular_bytes_necesarios(int totalFichas);
+unsigned char* evaluarYRedimensionar(unsigned char* tableroViejo, int fichasActivas, int &bytesReservados);
+void limpiar_bits_no_usados(unsigned char* tablero, int totalFichas, int bytesReservados);
 
 // Inicialización y juego
 void poblar_tablero(unsigned char* tab, int filas, int cols);
