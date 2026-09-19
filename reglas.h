@@ -30,13 +30,13 @@ void aplicar_gravedad_y_relleno(unsigned char* tablero,
                                 int filas,
                                 int columnas);
 
-void procesar_cascadas(unsigned char* tablero,
-                       int filas,
-                       int columnas,
-                       int& combinacionesTotales,
-                       int& fichasEliminadasTotales,
-                       int& cascadasActuales,
-                       int& puntuacion);
+bool procesar_un_paso_cascada(unsigned char* tablero,
+                              int filas,
+                              int columnas,
+                              int& combinacionesTotales,
+                              int& fichasEliminadasTotales,
+                              int& cascadasActuales,
+                              int& puntuacion);
 
 bool agregar_columna(unsigned char*& tablero,
                      int filas,
