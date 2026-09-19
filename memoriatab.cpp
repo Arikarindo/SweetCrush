@@ -96,6 +96,6 @@ void liberar_tablero(unsigned char* &tablero) {
     if (tablero != nullptr) {
         delete[] tablero;   
         tablero = nullptr;
-    }    
+    ¨{}    
 }
 
