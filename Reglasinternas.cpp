@@ -23,7 +23,7 @@ unsigned char generar_ficha_aleatoria()
         QRandomGenerator::global()->bounded(FICHASJUGABLES)
         );
 }
-void marcar_posicion(unsigned char* marcas, int indice)
+void marcar_posicion(unsigned char* marcas, int indice) //No sabe de reglas ni de fichas.
 {
     // MATEMATICA: Divide el indice entre 8 para ubicar exactamente en que Byte de la memoria se almacena la marca.
     int byte = indice / 8; 
@@ -35,5 +35,133 @@ void marcar_posicion(unsigned char* marcas, int indice)
     // Desplaza un '1' a la posicion calculada y hace OR. Resuelve encender ese bit especifico (marcar la ficha) sin borrar las demas marcas del byte.
     marcas[byte] |= static_cast<unsigned char>(1u << bit);
 }
+
+bool posicion_marcada(const unsigned char* marcas, int indice) //Solo consulta si ese bit específico está en 1 o en 0 
+{
+    // MATEMATICA: División entera para ubicar Byte, Módulo para ubicar bit dentro de la bandera de marcas  
+    int byte = indice / 8;
+    int bit = indice % 8;
+
+    // LOGICA: Se desplaza el 1 a la posicion del bit y se aplica una operacion AND (&) con el byte.
+    // Resuelve aislar el bit especifico; si el resultado no es cero (!= 0), significa que el bit estaba en 1 (estaba marcado).
+    return (marcas[byte] & static_cast<unsigned char>(1u << bit)) != 0;
+}
+
+int detectar_y_marcar_combinaciones(unsigned char* tablero, int filas,int columnas, int& fichasMarcadas)
+{
+    fichasMarcadas = 0;
+
+    if (tablero == nullptr || filas <= 0 || columnas <= 0)
+    {
+        return 0;
+    }
+
+    int totalFichas = filas * columnas;
+    // Asignación compacta: 1 bit por ficha en el Heap (división techo)
+    int bytesMarcas = (totalFichas + 7) / 8;
+    unsigned char* marcas = new unsigned char[bytesMarcas](); // Inicializado en 0x00
+
+    int combinaciones = 0;
+
+    // 1. ESCANEO HORIZONTAL (Fila por fila)
+    for (int fila = 0; fila < filas; fila++)
+    {
+        int columna = 0;
+        while (columna < columnas)
+        {
+            unsigned char ficha = leer_ficha(tablero, fila, columna, columnas);
+
+            // Se ignoran celdas vacías o con estados no jugables
+            if (ficha >= FICHASJUGABLES)
+            {
+                columna++;
+                continue;
+            }
+
+            int inicio = columna;
+            int longitud = 1;
+            columna++;
+
+            // Cuenta fichas idénticas consecutivas hacia la derecha
+            while (columna < columnas && leer_ficha(tablero, fila, columna, columnas) == ficha)
+            {
+                longitud++;
+                columna++;
+            }
+
+            // Si hay 3 o más consecutivas, se registra la combinación horizontal
+            if (longitud >= 3)
+            {
+                combinaciones++;
+                for (int c = inicio; c < inicio + longitud; c++)
+                {
+                    int indice = calcular_indice(fila, c, columnas);
+                    marcar_posicion(marcas, indice); // Enciende el bit correspondiente
+                }
+            }
+        }
+    }
+
+    // 2. ESCANEO VERTICAL (Columna por columna)
+    for (int columna = 0; columna < columnas; columna++)
+    {
+        int fila = 0;
+        while (fila < filas)
+        {
+            unsigned char ficha = leer_ficha(tablero, fila, columna, columnas);
+
+            if (ficha >= FICHASJUGABLES)
+            {
+                fila++;
+                continue;
+            }
+
+            int inicio = fila;
+            int longitud = 1;
+            fila++;
+
+            // Cuenta fichas idénticas consecutivas hacia abajo
+            while (fila < filas && leer_ficha(tablero, fila, columna, columnas) == ficha)
+            {
+                longitud++;
+                fila++;
+            }
+
+            // Si hay 3 o más consecutivas, se registra la combinación vertical
+            if (longitud >= 3)
+            {
+                combinaciones++;
+                for (int f = inicio; f < inicio + longitud; f++)
+                {
+                    int indice = calcular_indice(f, columna, columnas);
+                    marcar_posicion(marcas, indice); // Enciende el bit correspondiente
+                }
+            }
+        }
+    }
+
+    // 3. ESTAMPAR MARCAS EN EL TABLERO ORIGINAL
+    for (int fila = 0; fila < filas; fila++)
+    {
+        for (int columna = 0; columna < columnas; columna++)
+        {
+            int indice = calcular_indice(fila, columna, columnas);
+
+            if (posicion_marcada(marcas, indice))
+            {
+                guardarFicha(tablero, indice, MARCADO);
+                fichasMarcadas++;
+            }
+        }
+    }
+
+    // Liberación estricta del arreglo auxiliar para evitar memory leaks
+    delete[] marcas;
+    marcas = nullptr;
+
+    return combinaciones;
+}
+
+
 
 
