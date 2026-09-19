@@ -45,7 +45,7 @@ bool agregar_columna(unsigned char*& tablero,
     // CASO B: El bloque de memoria actual es insuficiente. Requiere reasignación en el Heap.
     else
     {
-        // Allocate de un nuevo bloque en el Heap
+        // Creación de un nuevo bloque en el Heap
         unsigned char* tableroNuevo = new unsigned char[bytesNecesarios]();
 
         for (int fila = 0; fila < filas; fila++)
@@ -81,7 +81,7 @@ bool agregar_columna(unsigned char*& tablero,
 
     columnas = columnasNuevas;
 
-    // Limpia bits huérfanos que puedan haber quedado en el último Byte
+    // Limpia bits en el aire que puedan haber quedado en el último Byte
     limpiar_bits_no_usados(tablero, filas * columnas, bytesReservados);
 
     return true;
@@ -132,6 +132,133 @@ bool eliminar_columna(unsigned char*& tablero,
     limpiar_bits_no_usados(tablero, totalNuevo, bytesReservados);
 
     // Revisa si es necesario liberar memoria en el Heap si el tamaño del tablero disminuyó bastante
+    tablero = evaluarYRedimensionar(tablero, totalNuevo, bytesReservados);
+
+    return true;
+}
+
+bool agregar_fila(unsigned char*& tablero,
+                  int& filas,
+                  int columnas,
+                  int posicion,
+                  int& bytesReservados)
+{
+    if (tablero == nullptr || filas <= 0 || columnas <= 0 || posicion < 0 || posicion > filas)
+    {
+        return false;
+    }
+
+    int filasViejas = filas;
+    int filasNuevas = filas + 1;
+    int totalNuevo = filasNuevas * columnas;
+
+    int bytesNecesarios = calcular_bytes_necesarios(totalNuevo);
+
+    // CASO A: Los Bytes reservados actualmente alcanzan
+    if (bytesNecesarios <= bytesReservados)
+    {
+        // Recorremos desde el final hacia el principio
+        for (int fila = filasViejas - 1; fila >= 0; fila--)
+        {
+            int nuevaFila = fila;
+            if (fila >= posicion)
+            {
+                nuevaFila++; // Desplaza las filas debajo del punto de inserción
+            }
+
+            for (int columna = 0; columna < columnas; columna++)
+            {
+                int viejoIndice = fila * columnas + columna;
+                unsigned char ficha = obtenerFicha(tablero, viejoIndice);
+
+                int nuevoIndice = nuevaFila * columnas + columna;
+                guardarFicha(tablero, nuevoIndice, ficha);
+            }
+        }
+    }
+    // CASO B: Reasignación en el Heap
+    else
+    {
+        unsigned char* tableroNuevo = new unsigned char[bytesNecesarios]();
+
+        for (int fila = 0; fila < filasViejas; fila++)
+        {
+            int nuevaFila = fila;
+            if (fila >= posicion)
+            {
+                nuevaFila++;
+            }
+
+            for (int columna = 0; columna < columnas; columna++)
+            {
+                int viejoIndice = fila * columnas + columna;
+                unsigned char ficha = obtenerFicha(tablero, viejoIndice);
+
+                int nuevoIndice = nuevaFila * columnas + columna;
+                guardarFicha(tableroNuevo, nuevoIndice, ficha);
+            }
+        }
+
+        delete[] tablero;
+        tablero = tableroNuevo;
+        bytesReservados = bytesNecesarios;
+    }
+
+    // Rellena la fila recién insertada con fichas aleatorias
+    for (int columna = 0; columna < columnas; columna++)
+    {
+        int indice = posicion * columnas + columna;
+        guardarFicha(tablero, indice, generar_ficha_aleatoria());
+    }
+
+    filas = filasNuevas;
+
+    limpiar_bits_no_usados(tablero, filas * columnas, bytesReservados);
+
+    return true;
+}
+
+bool eliminar_fila(unsigned char*& tablero,
+                   int& filas,
+                   int columnas,
+                   int posicion,
+                   int& bytesReservados)
+{
+    if (tablero == nullptr || filas <= 1 || columnas <= 0 || posicion < 0 || posicion >= filas)
+    {
+        return false;
+    }
+
+    int filasViejas = filas;
+    int filasNuevas = filas - 1;
+
+    for (int fila = 0; fila < filasViejas; fila++)
+    {
+        if (fila == posicion)
+        {
+            continue; // Salta la fila eliminada
+        }
+
+        int nuevaFila = fila;
+        if (fila > posicion)
+        {
+            nuevaFila--; // Sube las filas
+        }
+
+        for (int columna = 0; columna < columnas; columna++)
+        {
+            int viejoIndice = fila * columnas + columna;
+            unsigned char ficha = obtenerFicha(tablero, viejoIndice);
+
+            int nuevoIndice = nuevaFila * columnas + columna;
+            guardarFicha(tablero, nuevoIndice, ficha);
+        }
+    }
+
+    filas = filasNuevas;
+    int totalNuevo = filas * columnas;
+
+    limpiar_bits_no_usados(tablero, totalNuevo, bytesReservados);
     tablero = evaluarYRedimensionar(tablero, totalNuevo, bytesReservados);
 
     return true;

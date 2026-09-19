@@ -52,4 +52,16 @@ bool eliminar_columna(unsigned char*& tablero,
                       int posicion,
                       int& bytesReservados);
 
+bool agregar_fila(unsigned char*& tablero,
+                  int& filas,
+                  int columnas,
+                  int posicion,
+                  int& bytesReservados);
+
+bool eliminar_fila(unsigned char*& tablero,
+                   int& filas,
+                   int columnas,
+                   int posicion,
+                   int& bytesReservados);
+
 #endif
