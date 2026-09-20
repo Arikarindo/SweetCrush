@@ -23,6 +23,27 @@ unsigned char generar_ficha_aleatoria()
         QRandomGenerator::global()->bounded(FICHASJUGABLES)
         );
 }
+
+void poblar_aleatorio(unsigned char* tablero, int filas, int columnas)
+{
+    int totalFichas = filas * columnas;
+    for (int i = 0; i < totalFichas; i++)
+    {
+        guardarFicha(tablero, i, generar_ficha_aleatoria());
+    }
+}
+
+bool eliminar_ficha(unsigned char* tablero, int fila, int columna, int filas, int columnas)
+{
+    if (fila < 0 || fila >= filas || columna < 0 || columna >= columnas)
+    {
+        return false; // Coordenadas inválidas
+    }
+
+    int indice = fila * columnas + columna;
+    guardarFicha(tablero, indice, VACIO);
+    return true;
+}
 void marcar_posicion(unsigned char* marcas, int indice) //No sabe de reglas ni de fichas.
 {
     // MATEMATICA: Divide el indice entre 8 para ubicar exactamente en que Byte de la memoria se almacena la marca.
