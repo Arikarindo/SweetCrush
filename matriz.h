@@ -9,6 +9,8 @@ unsigned char* evaluarYRedimensionar(unsigned char* tableroViejo, int fichasActi
 void limpiar_bits_no_usados(unsigned char* tablero, int totalFichas, int bytesReservados);
 
 // Inicialización y juego
+unsigned char* crearTablero(int filas, int columnas, int &bytesReservados);
+void liberar_tablero(unsigned char* &tablero);
 void poblar_tablero(unsigned char* tab, int filas, int cols);
 void poner_ficha(unsigned char* tab, int fil, int col, int cols, unsigned char val);
 bool borrar_ficha_usr(unsigned char* tab, int fil, int col, int filas, int cols);
