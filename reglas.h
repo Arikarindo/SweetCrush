@@ -13,11 +13,11 @@ void poblar_aleatorio(unsigned char* tablero,
 
 unsigned char generar_ficha_aleatoria();
 
-bool eliminar_ficha_usuario(unsigned char* tablero,
-                            int fila,
-                            int columna,
-                            int filas,
-                            int columnas);
+bool eliminar_ficha(unsigned char* tablero,
+                    int fila,
+                    int columna,
+                    int filas,
+                    int columnas);
 
 int detectar_y_marcar_combinaciones(unsigned char* tablero,
                                      int filas,

@@ -13,12 +13,12 @@ const unsigned char TOTALFICHAS = 8;
 
 const char SIMBOLOS_FICHA[TOTALFICHAS] =
 {
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
+    '!',
+    '#',
+    '$',
+    '&',
+    '/',
+    '?',
     '_',
     'X'
 };
