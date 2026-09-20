@@ -1,0 +1,3 @@
+C:/Users/samun/Videos/SweetCrush/build/Desktop_Qt_6_11_2_MinGW_64_bit_Debug/CMakeFiles/SweetCrush.dir
+C:/Users/samun/Videos/SweetCrush/build/Desktop_Qt_6_11_2_MinGW_64_bit_Debug/CMakeFiles/edit_cache.dir
+C:/Users/samun/Videos/SweetCrush/build/Desktop_Qt_6_11_2_MinGW_64_bit_Debug/CMakeFiles/rebuild_cache.dir
